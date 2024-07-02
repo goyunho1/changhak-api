@@ -2,11 +2,13 @@ package changhak.changhakapi.controller;
 
 import changhak.changhakapi.dto.AvgSignalDTO;
 import changhak.changhakapi.domain.AvgSignal;
+import changhak.changhakapi.dto.Location;
 import changhak.changhakapi.service.AvgSignalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/changhak")
@@ -36,5 +38,16 @@ public class AvgSignalController {
     public List<AvgSignal> getSignals(@RequestParam(name = "cell") Long cell,
                                       @RequestParam(name = "ap") String ap) {
         return avgSignalService.getByCellAndAp(cell, ap);
+    }
+
+    @GetMapping("/abc")
+    public long abc(){
+        return 1;
+    }
+
+    @GetMapping("/position")
+    public Location getPosition(@RequestParam Map<String, String> signals) {
+
+        return avgSignalService.getPosition(signals);
     }
 }
