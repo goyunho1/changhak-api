@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController //@Controller (컨트롤러 등록) + @ResponseBody (뷰 없을 때)
 @RequestMapping("/changhak")
 public class AvgSignalController {
 
     @Autowired
     private AvgSignalService avgSignalService;
-
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     // 요청 좀 더 명확한 이름으로 바꿔야 됨
@@ -45,7 +44,8 @@ public class AvgSignalController {
         return 1;
     }
 
-    @GetMapping("/position")
+    @GetMapping("/position")        //HTTP 요청 파라미터는 항상 문자열로 전달된다 ( Map<String, Integer> ==> <String, String> )
+                                    //@RequestBody?
     public Location getPosition(@RequestParam Map<String, String> signals) {
 
         return avgSignalService.getPosition(signals);
