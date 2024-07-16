@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class SpringConfig {
     private final AvgSignalRepository avgSignalRepository;
 
+    @Autowired
     public SpringConfig(AvgSignalRepository avgSignalRepository) {
         this.avgSignalRepository = avgSignalRepository;
     }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController //@Controller (컨트롤러 등록) + @ResponseBody (뷰 없을 때)
+@RestController //@Controller (컨트롤러 등록) + @ResponseBody ( 뷰 없을 때 <<API 용도 )
 @RequestMapping("/changhak")
 public class AvgSignalController {
 

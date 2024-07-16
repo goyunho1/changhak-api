@@ -4,8 +4,8 @@ import java.util.*;
 
 public class RealTimeProcessor {
     private static final double ALPHA = 0.8; // 지수 가중 이동 평균 필터의 알파 값
-    private static final int TOP_N = 5; // 상위 N개의 신호를 선택하기 위한 값
-    private static final List<String> MAC_PREFIXES = Arrays.asList("34:fc", "b4:5d"); // MAC 주소 접두사 목록'
+    private static final int TOP_N = 10; // 상위 N개의 신호를 선택하기 위한 값
+
 
     // 각 MAC 주소에 대한 EWMA 값과 데이터 개수를 저장하는 Map
     private Map<String, Double> ewmaMap;
