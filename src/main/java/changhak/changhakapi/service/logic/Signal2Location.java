@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 @Component
 public class Signal2Location {
 
+    private static final int TOP_N = 10; // 상위 N개의 신호를 선택하기 위한 값
     private static final Logger logger = LoggerFactory.getLogger(Signal2Location.class);
     public Location calc(Map<String, String> signals){
         RealTimeProcessor realTimeProcessor = new RealTimeProcessor();
@@ -20,11 +21,22 @@ public class Signal2Location {
             currentSignals.put(entry.getKey(), Integer.parseInt(entry.getValue()));
         }
 
-        String[][] filtered = realTimeProcessor.processData(currentSignals);
-        logger.info("Filtered data: {}", Arrays.deepToString(filtered));
+
+//      String[][] filtered = realTimeProcessor.processData(currentSignals);
+//      logger.info("Filtered data: {}", Arrays.deepToString(filtered));
+
+
+
+        // currentSignals 맵을 정렬된 상위 10개로 필터링하고, 2차원 배열로 변환
+        String[][] filtered = currentSignals.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(TOP_N)
+                .map(entry -> new String[]{entry.getKey(), String.valueOf(entry.getValue())})
+                .toArray(String[][]::new);
+
 
         double[] distance = AllDistanceCalculator.allDistance(filtered);
-        logger.info("Calculated distances: {}", Arrays.toString(distance));
 
         int[] indices = IntStream.range(0, distance.length)
                 .boxed()
@@ -36,7 +48,7 @@ public class Signal2Location {
 
         // closestIndices에 66을 더한 값 계산
         int[] adjustedIndices = IntStream.of(closestIndices)
-                .map(i -> i + 66)
+                .map(i -> i + 1 )
                 .toArray();
 
         // adjustedIndices 로그 출력

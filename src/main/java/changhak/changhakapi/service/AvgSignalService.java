@@ -36,7 +36,7 @@ public class AvgSignalService {
     }
 
     public Location getPosition(Map<String, String> signals) {
-        logger.info("Received signals: {}", signals);
+//        logger.info("Received signals: {}", signals);
         Location location = signal2Location.calc(signals);
         logger.info("Calculated location: {}", location);
         return location;
