@@ -3,10 +3,12 @@ package changhak.changhakapi.dto;
 public class Location {
     private double latitude;
     private double longitude;
+    private double floor;
 
-    public Location(double latitude, double longitude) {
+    public Location(double latitude, double longitude,  double floor) {
         this.latitude = latitude;
         this.longitude = longitude;
+        this.floor = floor;
     }
 
     public double getLatitude() {
@@ -25,5 +27,13 @@ public class Location {
         this.longitude = longitude;
     }
 
+
+    public double getFloor() {
+        return floor;
+    }
+
+    public void setFloor(double floor) {
+        this.floor = floor;
+    }
 
 }

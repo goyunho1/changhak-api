@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @RestController //@Controller (컨트롤러 등록) + @ResponseBody ( 뷰 없을 때 <<API 용도 )
 @RequestMapping("/changhak")
@@ -45,9 +46,7 @@ public class AvgSignalController {
     }
 
     @GetMapping("/position")        //HTTP 요청 파라미터는 항상 문자열로 전달된다 ( Map<String, Integer> ==> <String, String> )
-                                    //@RequestBody?
-    public Location getPosition(@RequestParam Map<String, String> signals) {
-
-        return avgSignalService.getPosition(signals);
+    public CompletableFuture<Location> getPosition(@RequestParam Map<String, String> signals) {
+        return avgSignalService.getPositionAsync(signals);
     }
 }

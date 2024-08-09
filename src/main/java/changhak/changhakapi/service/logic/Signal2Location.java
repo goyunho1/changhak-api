@@ -61,8 +61,7 @@ public class Signal2Location {
 
         double latitude = estimateCoordinates[0];
         double longitude = estimateCoordinates[1];
-
-        return new Location(latitude, longitude);
+        double floor = estimateCoordinates[2];
+        return new Location(latitude, longitude, floor);
     }
 }
-
