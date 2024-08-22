@@ -4,6 +4,7 @@ import changhak.changhakapi.domain.AvgSignal;
 import changhak.changhakapi.dto.AvgSignalDTO;
 import changhak.changhakapi.dto.Location;
 import changhak.changhakapi.repository.AvgSignalRepository;
+import changhak.changhakapi.service.logic.EnhancedSignal2Location;
 import changhak.changhakapi.service.logic.Signal2Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,11 @@ public class AvgSignalService {
     @Autowired
     private AvgSignalRepository avgSignalRepository;
 
+//    @Autowired
+//    private Signal2Location signal2Location;
+
     @Autowired
-    private Signal2Location signal2Location;
+    private EnhancedSignal2Location enhancedSignal2Location;
 
     public void saveAvgSignal(AvgSignalDTO avgSignalDto) {
         AvgSignal avgSignal = new AvgSignal(avgSignalDto.getCell(), avgSignalDto.getAp(),avgSignalDto.getSignalValue());
@@ -40,7 +44,7 @@ public class AvgSignalService {
     @Async
     public CompletableFuture<Location> getPositionAsync(Map<String, String> signals) {
         logger.info("Start calculating position asynchronously at {}", System.currentTimeMillis());
-        Location location = signal2Location.calc(signals);
+        Location location = enhancedSignal2Location.calc(signals);
         logger.info("End calculating position asynchronously at {}", System.currentTimeMillis());
         return CompletableFuture.completedFuture(location);
     }
