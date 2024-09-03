@@ -17,7 +17,7 @@ public class AllDistanceCalculator {
             throw new RuntimeException("Failed to load cell signals from CSV file.");
         }
 
-        int numCells = 134; // 셀의 개수
+        int numCells = 144; // 셀의 개수
 
         double[] distances = new double[numCells];
 
