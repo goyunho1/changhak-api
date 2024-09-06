@@ -1,11 +1,25 @@
 package changhak.changhakapi.service.logic;
 
+
+import changhak.changhakapi.dto.Location;
+import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.IntStream;
-
+@Service
 public class LocationEstimator {
 
+    private Location prevLocation;
+
+    public LocationEstimator() {
+        // 기본 위치로 초기화
+        this.prevLocation = new Location(37.63266876291934, 127.07916730017462, 1);
+    }
+
+    public void setPrevLocation(Location location) {
+        this.prevLocation = location;
+    }
 
     // 창학관 x 좌표 배열
     private static double[] x = {
@@ -90,6 +104,63 @@ public class LocationEstimator {
             127.07919273311532,127.07919273311532,127.07919273311532,
             127.07992043190616,127.07992043190616,127.07992043190616
     };
+
+
+    public double[] estimateLoc(double[] distances, int K, double sigma) {
+        double prevX = prevLocation.getLatitude();
+        double prevY = prevLocation.getLongitude();
+
+        // 유클리드 거리에 기반한 가중치 계산
+        double[] weightedDistances = new double[distances.length];
+        for (int i = 0; i < distances.length; i++) {
+            double distanceToPrev = Math.pow(x[i] - prevX, 2) + Math.pow(y[i] - prevY, 2);
+            double weight = Math.exp(distanceToPrev / (4 * sigma * sigma));
+            weightedDistances[i] = distances[i] * weight;
+        }
+
+        // 수정된 유클리드 거리(weightedDistances)를 기반으로 가까운 K개의 이웃 선정
+        int[] indices = IntStream.range(0, weightedDistances.length)
+                .boxed()
+                .sorted(Comparator.comparingDouble(i -> weightedDistances[i]))
+                .mapToInt(i -> i)
+                .toArray();
+
+        int[] closestIndices = Arrays.copyOf(indices, K);
+
+        double[] minDistances = new double[K];
+        for (int i = 0; i < K; i++) {
+            minDistances[i] = weightedDistances[closestIndices[i]];
+        }
+
+        double totalWeight = 0;
+        for (double d : minDistances) {
+            totalWeight += 1.0 / d;
+        }
+
+        double x_hat = 0;
+        double y_hat = 0;
+
+        for (int i = 0; i < K; i++) {
+            int index = closestIndices[i];
+            x_hat += x[index] * (1.0 / minDistances[i]);
+            y_hat += y[index] * (1.0 / minDistances[i]);
+        }
+
+        x_hat /= totalWeight;
+        y_hat /= totalWeight;
+
+        // 층 정보를 계산
+        double floor = 0;
+        int a = closestIndices[0] + 1;
+        if (a <= 132 && a >= 67) {
+            floor = 2;
+        } else if (a == 134 || a == 133 || (a >= 1 && a <= 66)) {
+            floor = 1;
+        }
+
+        return new double[]{x_hat, y_hat, floor};
+    }
+}
 
 
     /*
@@ -240,51 +311,6 @@ public class LocationEstimator {
 
     };
     */
-
-    public static double[] estimateLoc(double[] distances, int K) {
-        int[] indices = IntStream.range(0, distances.length)
-                .boxed()
-                .sorted(Comparator.comparingDouble(i -> distances[i]))
-                .mapToInt(i -> i)
-                .toArray();
-
-        int[] closestIndices = Arrays.copyOf(indices, K);
-
-        double[] minDistances = new double[K];
-        for (int i = 0; i < K; i++) {
-            minDistances[i] = distances[closestIndices[i]];
-        }
-
-        double totalWeight = 0;
-        for (double d : minDistances) {
-            totalWeight += 1.0 / d;
-        }
-
-        double x_hat = 0;
-        double y_hat = 0;
-
-        for (int i = 0; i < K; i++) {
-            int index = closestIndices[i];
-            x_hat += x[index] * (1.0 / minDistances[i]);
-            y_hat += y[index] * (1.0 / minDistances[i]);
-        }
-
-        x_hat /= totalWeight;
-        y_hat /= totalWeight;
-
-        //double 배열에 담아 보낼거라서 double로 선언
-        double floor = 0;
-        int a = closestIndices[0] + 1;
-        if (a<=132 && a>=67){
-            floor = 2;
-        }else if (a == 134 || a ==133 ||
-                (a>=1 && a<=66)){
-            floor = 1;
-        }
-
-        return new double[]{x_hat, y_hat, floor};
-    }
-}
 
 
 

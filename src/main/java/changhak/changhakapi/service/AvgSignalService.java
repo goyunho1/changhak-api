@@ -5,6 +5,7 @@ import changhak.changhakapi.dto.AvgSignalDTO;
 import changhak.changhakapi.dto.Location;
 import changhak.changhakapi.repository.AvgSignalRepository;
 import changhak.changhakapi.service.logic.EnhancedSignal2Location;
+import changhak.changhakapi.service.logic.LocationEstimator;
 import changhak.changhakapi.service.logic.Signal2Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +23,14 @@ public class AvgSignalService {
     @Autowired
     private AvgSignalRepository avgSignalRepository;
 
-//    @Autowired
-//    private Signal2Location signal2Location;
+    @Autowired
+    private Signal2Location signal2Location;
+
+    //@Autowired
+    //private EnhancedSignal2Location enhancedSignal2Location;
 
     @Autowired
-    private EnhancedSignal2Location enhancedSignal2Location;
+    private LocationEstimator locationEstimator;
 
     public void saveAvgSignal(AvgSignalDTO avgSignalDto) {
         AvgSignal avgSignal = new AvgSignal(avgSignalDto.getCell(), avgSignalDto.getAp(),avgSignalDto.getSignalValue());
@@ -43,9 +47,12 @@ public class AvgSignalService {
 
     @Async
     public CompletableFuture<Location> getPositionAsync(Map<String, String> signals) {
-        logger.info("Start calculating position asynchronously at {}", System.currentTimeMillis());
-        Location location = enhancedSignal2Location.calc(signals);
-        logger.info("End calculating position asynchronously at {}", System.currentTimeMillis());
+        //계산시간 로그
+        // logger.info("Start calculating position asynchronously at {}", System.currentTimeMillis());
+        Location location = signal2Location.calc(signals);
+        locationEstimator.setPrevLocation(location);
+        //계산시간 로그
+        // logger.info("End calculating position asynchronously at {}", System.currentTimeMillis());
         return CompletableFuture.completedFuture(location);
     }
 }

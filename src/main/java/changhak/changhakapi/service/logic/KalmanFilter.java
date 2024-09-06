@@ -24,12 +24,11 @@ public class KalmanFilter {
     public double update(double measurement) {
         // Prediction update
         p += q;
-
+        logger.info("prev x: ({})", x);
         // Measurement update
         k = p / (p + r);
         x += k * (measurement - x);
         p *= (1 - k);
-        logger.info("Kalman Filter Update - measurement: {}, q: {}, r: {}, x: {}, p: {}, k: {}", measurement,q, r, x, p, k);
 
         return x;
     }

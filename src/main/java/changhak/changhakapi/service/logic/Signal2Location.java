@@ -3,6 +3,7 @@ package changhak.changhakapi.service.logic;
 import changhak.changhakapi.dto.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,6 +14,13 @@ public class Signal2Location {
 
     private static final int TOP_N = 10; // 상위 N개의 신호를 선택하기 위한 값
     private static final Logger logger = LoggerFactory.getLogger(Signal2Location.class);
+    private final LocationEstimator locationEstimator;
+
+    @Autowired
+    public Signal2Location(LocationEstimator locationEstimator) {
+        this.locationEstimator = locationEstimator;
+    }
+
     public Location calc(Map<String, String> signals){
 
         Map<String, Integer> currentSignals = new HashMap<>();
@@ -40,7 +48,6 @@ public class Signal2Location {
 
         int[] closestIndices = Arrays.copyOf(indices, 3);
 
-        // closestIndices에 66을 더한 값 계산
         int[] adjustedIndices = IntStream.of(closestIndices)
                 .map(i -> i + 1 )
                 .toArray();
@@ -48,12 +55,13 @@ public class Signal2Location {
         // adjustedIndices 로그 출력
         logger.info("Indices of the smallest 3 distances (adjusted): {}", Arrays.toString(adjustedIndices));
 
-        double[] estimateCoordinates = LocationEstimator.estimateLoc(distance, 3);
+        double[] estimateCoordinates = locationEstimator.estimateLoc(distance, 3, 4);
         logger.info("Estimated coordinates: {}", Arrays.toString(estimateCoordinates));
 
         double latitude = estimateCoordinates[0];
         double longitude = estimateCoordinates[1];
         double floor = estimateCoordinates[2];
+
         return new Location(latitude, longitude, floor);
     }
 }

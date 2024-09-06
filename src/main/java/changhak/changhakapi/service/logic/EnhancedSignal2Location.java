@@ -3,6 +3,7 @@ package changhak.changhakapi.service.logic;
 import changhak.changhakapi.dto.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -16,10 +17,14 @@ public class EnhancedSignal2Location {
 
     private final KalmanFilter kalmanFilterX;
     private final KalmanFilter kalmanFilterY;
+    private final LocationEstimator locationEstimator;
 
-    public EnhancedSignal2Location() {
+    @Autowired
+    public EnhancedSignal2Location(LocationEstimator locationEstimator) {
+        this.locationEstimator = locationEstimator;
         this.kalmanFilterX = new KalmanFilter(1, 1, 37.63221356558527, 1); // 초기값은 예시
         this.kalmanFilterY = new KalmanFilter(1, 1, 127.07946420260444, 1);
+
     }
 
     public Location calc(Map<String, String> signals) {
@@ -54,14 +59,13 @@ public class EnhancedSignal2Location {
         // adjustedIndices 로그 출력
         logger.info("Indices of the smallest 3 distances (adjusted): {}", Arrays.toString(adjustedIndices));
 
-        double[] estimateCoordinates = LocationEstimator.estimateLoc(distance, 3);
+        double[] estimateCoordinates = locationEstimator.estimateLoc(distance, 3, 4);
         logger.info("Estimated coordinates: {}", Arrays.toString(estimateCoordinates));
 
 
         // 칼만 필터를 이용한 위치 추정값 업데이트
         double filteredX = kalmanFilterX.update(estimateCoordinates[0]);
         double filteredY = kalmanFilterY.update(estimateCoordinates[1]);
-
         logger.info("Filtered coordinates: ({}, {})", filteredX, filteredY);
 
         double floor = estimateCoordinates[2];
