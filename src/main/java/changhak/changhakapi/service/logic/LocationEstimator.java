@@ -311,6 +311,3 @@ public class LocationEstimator {
 
     };
     */
-
-
-

@@ -22,8 +22,8 @@ public class EnhancedSignal2Location {
     @Autowired
     public EnhancedSignal2Location(LocationEstimator locationEstimator) {
         this.locationEstimator = locationEstimator;
-        this.kalmanFilterX = new KalmanFilter(1, 1, 37.63221356558527, 1); // 초기값은 예시
-        this.kalmanFilterY = new KalmanFilter(1, 1, 127.07946420260444, 1);
+        this.kalmanFilterX = new KalmanFilter(0.5, 1, 37.63221356558527, 1); // 초기값은 예시
+        this.kalmanFilterY = new KalmanFilter(0.5, 1, 127.07946420260444, 1);
 
     }
 

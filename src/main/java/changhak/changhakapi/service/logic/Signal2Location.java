@@ -14,11 +14,16 @@ public class Signal2Location {
 
     private static final int TOP_N = 10; // 상위 N개의 신호를 선택하기 위한 값
     private static final Logger logger = LoggerFactory.getLogger(Signal2Location.class);
+    private final KalmanFilter kalmanFilterX;
+    private final KalmanFilter kalmanFilterY;
     private final LocationEstimator locationEstimator;
 
     @Autowired
     public Signal2Location(LocationEstimator locationEstimator) {
         this.locationEstimator = locationEstimator;
+        this.kalmanFilterX = new KalmanFilter(0.5, 1, 37.63221356558527, 1); // 초기값은 예시
+        this.kalmanFilterY = new KalmanFilter(0.5, 1, 127.07946420260444, 1);
+
     }
 
     public Location calc(Map<String, String> signals){
@@ -58,10 +63,12 @@ public class Signal2Location {
         double[] estimateCoordinates = locationEstimator.estimateLoc(distance, 3, 4);
         logger.info("Estimated coordinates: {}", Arrays.toString(estimateCoordinates));
 
-        double latitude = estimateCoordinates[0];
-        double longitude = estimateCoordinates[1];
+        double filteredX = kalmanFilterX.update(estimateCoordinates[0]);
+        double filteredY = kalmanFilterY.update(estimateCoordinates[1]);
+        logger.info("Filtered coordinates: ({}, {})", filteredX, filteredY);
+
         double floor = estimateCoordinates[2];
 
-        return new Location(latitude, longitude, floor);
+        return new Location(filteredX, filteredY, floor);
     }
 }

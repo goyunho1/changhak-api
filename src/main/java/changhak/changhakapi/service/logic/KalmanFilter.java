@@ -24,7 +24,6 @@ public class KalmanFilter {
     public double update(double measurement) {
         // Prediction update
         p += q;
-        logger.info("prev x: ({})", x);
         // Measurement update
         k = p / (p + r);
         x += k * (measurement - x);
