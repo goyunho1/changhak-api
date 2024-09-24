@@ -14,20 +14,17 @@ public class Signal2Location {
 
     private static final int TOP_N = 10; // 상위 N개의 신호를 선택하기 위한 값
     private static final Logger logger = LoggerFactory.getLogger(Signal2Location.class);
-    private final KalmanFilter kalmanFilterX;
-    private final KalmanFilter kalmanFilterY;
-    private final LocationEstimator locationEstimator;
+
+    private final LocationEstimator2 locationEstimator;
 
     @Autowired
-    public Signal2Location(LocationEstimator locationEstimator) {
+    public Signal2Location(LocationEstimator2 locationEstimator) {
         this.locationEstimator = locationEstimator;
-        this.kalmanFilterX = new KalmanFilter(0.5, 1, 37.63221356558527, 1); // 초기값은 예시
-        this.kalmanFilterY = new KalmanFilter(0.5, 1, 127.07946420260444, 1);
 
     }
 
     public Location calc(Map<String, String> signals){
-
+        int K = 6;
         Map<String, Integer> currentSignals = new HashMap<>();
         for (Map.Entry<String, String> entry : signals.entrySet()) {
             currentSignals.put(entry.getKey(), Integer.parseInt(entry.getValue()));
@@ -51,7 +48,7 @@ public class Signal2Location {
                 .mapToInt(i -> i)
                 .toArray();
 
-        int[] closestIndices = Arrays.copyOf(indices, 3);
+        int[] closestIndices = Arrays.copyOf(indices, K);
 
         int[] adjustedIndices = IntStream.of(closestIndices)
                 .map(i -> i + 1 )
@@ -60,15 +57,11 @@ public class Signal2Location {
         // adjustedIndices 로그 출력
         logger.info("Indices of the smallest 3 distances (adjusted): {}", Arrays.toString(adjustedIndices));
 
-        double[] estimateCoordinates = locationEstimator.estimateLoc(distance, 3, 4);
+        double[] estimateCoordinates = locationEstimator.estimateLoc(distance, K);
         logger.info("Estimated coordinates: {}", Arrays.toString(estimateCoordinates));
-
-        double filteredX = kalmanFilterX.update(estimateCoordinates[0]);
-        double filteredY = kalmanFilterY.update(estimateCoordinates[1]);
-        logger.info("Filtered coordinates: ({}, {})", filteredX, filteredY);
 
         double floor = estimateCoordinates[2];
 
-        return new Location(filteredX, filteredY, floor);
+        return new Location(estimateCoordinates[0], estimateCoordinates[1], floor);
     }
 }

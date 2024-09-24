@@ -1,6 +1,5 @@
 package changhak.changhakapi.service.logic;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 public class AllDistanceCalculator {
@@ -17,7 +16,7 @@ public class AllDistanceCalculator {
             throw new RuntimeException("Failed to load cell signals from CSV file.");
         }
 
-        int numCells = 144; // 셀의 개수
+        int numCells = 144; // 셀의 개수, csv 파일과 연계 필요
 
         double[] distances = new double[numCells];
 

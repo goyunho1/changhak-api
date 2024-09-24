@@ -4,7 +4,6 @@ import changhak.changhakapi.domain.AvgSignal;
 import changhak.changhakapi.dto.AvgSignalDTO;
 import changhak.changhakapi.dto.Location;
 import changhak.changhakapi.repository.AvgSignalRepository;
-import changhak.changhakapi.service.logic.EnhancedSignal2Location;
 import changhak.changhakapi.service.logic.LocationEstimator;
 import changhak.changhakapi.service.logic.Signal2Location;
 import org.slf4j.Logger;
@@ -13,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -50,7 +50,7 @@ public class AvgSignalService {
         //계산시간 로그
         // logger.info("Start calculating position asynchronously at {}", System.currentTimeMillis());
         Location location = signal2Location.calc(signals);
-        locationEstimator.setPrevLocation(location);
+        //locationEstimator.setPrevLocation(location);
         //계산시간 로그
         // logger.info("End calculating position asynchronously at {}", System.currentTimeMillis());
         return CompletableFuture.completedFuture(location);
