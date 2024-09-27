@@ -27,7 +27,6 @@ public class Location {
         this.longitude = longitude;
     }
 
-
     public double getFloor() {
         return floor;
     }

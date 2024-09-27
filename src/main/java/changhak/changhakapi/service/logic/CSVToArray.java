@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVToArray2 {
+public class CSVToArray {
 
     public static String[][] readCSVToArray(String csvFilePath) throws IOException {
         List<String[]> allCellSignalsList = new ArrayList<>();

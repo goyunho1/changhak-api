@@ -14,12 +14,9 @@ public class AvgSignal {
     private String ap;
     private Long signalValue;
 
-
-    // 기본 생성자 (필수)
     public AvgSignal() {
     }
 
-    // 필요한 경우 다른 생성자 추가
     public AvgSignal(Long cell, String ap, Long signalValue) {
         this.cell = cell;
         this.ap = ap;
