@@ -21,7 +21,8 @@ public class AllDistanceCalculator {
         double[] distances = new double[numCells];
 
         for (int i = 0; i < numCells; i++) {
-            String[][] cellSignals = Arrays.copyOfRange(allCellSignals, i * 20, (i + 1) * 20); // cell 당 데이터 개수 : 20
+                                                      // cell 당 데이터 개수 : 20
+            String[][] cellSignals = Arrays.copyOfRange(allCellSignals, i * 20, (i + 1) * 20);
             distances[i] = DistanceCalculator.calcDistance(cellSignals, currentSignals);
         }
         return distances;

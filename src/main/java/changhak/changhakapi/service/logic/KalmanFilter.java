@@ -3,8 +3,6 @@ package changhak.changhakapi.service.logic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-
 public class KalmanFilter {
     private double q; // Process noise covariance
     private double r; // Measurement noise covariance
@@ -30,13 +28,5 @@ public class KalmanFilter {
         p *= (1 - k);
 
         return x;
-    }
-
-    public void setProcessNoiseCovariance(double q) {
-        this.q = q;
-    }
-
-    public void setMeasurementNoiseCovariance(double r) {
-        this.r = r;
     }
 }

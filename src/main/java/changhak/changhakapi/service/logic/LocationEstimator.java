@@ -17,10 +17,6 @@ public class LocationEstimator {
         this.prevLocation = new Location(37.63266876291934, 127.07916730017462, 1);
     }
 
-    public void setPrevLocation(Location location) {
-        this.prevLocation = location;
-    }
-
     // 창학관 x 좌표 배열
     private static double[] x = {
             37.63266876291934, 37.63266197892042, 37.632652940543466, 37.632641653495384,
