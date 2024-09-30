@@ -94,11 +94,11 @@ public class LocationEstimator {
             127.07919273311532,127.07919273311532,127.07919273311532,
             127.07992043190616,127.07992043190616,127.07992043190616
     };
-
+    //Signal2Location과 겹치는 부분
     public double[] estimateLoc(double[] distances, int K) {
                                              // 에러 측정시 기준 좌표
-        double targetX = 37.632605509317244; // 예시 값, 원하는 특정 위치의 위도
-        double targetY = 127.07944196190547; // 예시 값, 원하는 특정 위치의 경도
+        double targetX = 37.63266876291934; // 예시 값, 원하는 특정 위치의 위도
+        double targetY = 127.07916730017462; // 예시 값, 원하는 특정 위치의 경도
 
         int[] closestIndices = IntStream.range(0, distances.length)     //0부터 distances.len-1 까지의 IntStream 생성
                 .boxed()
@@ -129,9 +129,15 @@ public class LocationEstimator {
         x_hat /= totalWeight;
         y_hat /= totalWeight;
 
-        double distanceError = Math.sqrt(Math.pow(x_hat - targetX, 2) + Math.pow(y_hat - targetY, 2));
-        double actualError = distanceError * 88000;
-        logger.info("actualError : {}", actualError);
+        //에러 로그
+        double dx = x_hat - targetX;
+        double dy = y_hat - targetY;
+
+        double dlat = 111139;
+        double dlon = 85000;
+
+        double distanceError = Math.sqrt(Math.pow(dx * dlon, 2) + Math.pow(dy * dlat, 2));
+        logger.info("distanceError : {}", distanceError);
 
         //double 배열에 담아 보낼거라서 double로 선언
         double floor = 0;

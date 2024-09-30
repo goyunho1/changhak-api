@@ -42,21 +42,31 @@ public class DistanceCalculator {
     private static double calcDistance(String[][] cellSignals, String[][] currentSignals) {
         HashMap<String, Double> cellTable = new HashMap<>();
         for (String[] cellSignal : cellSignals) {
-            cellTable.put(cellSignal[1], Double.parseDouble(cellSignal[2]));     //cellTable<ap,rssi>, size = 20
+            cellTable.put(cellSignal[1], Double.parseDouble(cellSignal[2])); // cellTable<ap,rssi>, size = 20
         }
 
         double distance = 0;
         double defaultRssi = -100;
+        double sumOfWeights = 0;
 
-        for (String[] currentSignal : currentSignals) {                 //currentSignals => 측정한 rssi값 상위 10개의 ap,rssi 2차원 배열
-            String mac = currentSignal[0];                              //ap 측정값
-            double currentRssi = Double.parseDouble(currentSignal[1]);  //rssi 측정값
+        for (String[] currentSignal : currentSignals) {
+            String mac = currentSignal[0]; // ap 측정값
+            double currentRssi = Double.parseDouble(currentSignal[1]); // rssi 측정값
 
             double cellRssi = cellTable.containsKey(mac) ? cellTable.get(mac) : defaultRssi;
 
-            distance += Math.abs(cellRssi - currentRssi);
+            double weight = 1 / Math.abs(cellRssi); // cellRssi의 절댓값의 역수
+            sumOfWeights += weight; // 모든 cellRssi의 절댓값의 역수의 합
+
+            distance += weight * Math.abs(cellRssi - currentRssi); // 가중치를 적용한 distance 계산
         }
-        return distance;    //i번째 cell의 distance
+
+        // 가중치를 적용하여 최종 distance 계산
+        if (sumOfWeights != 0) {
+            distance /= sumOfWeights; // 가중치의 합으로 나누기
+        }
+
+        return distance; // i번째 cell의 distance
     }
 }
 

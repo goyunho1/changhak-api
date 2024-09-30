@@ -2,9 +2,8 @@ package changhak.changhakapi.service.logic;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class KalmanFilter {
     private double q; // Process noise covariance
     private double r; // Measurement noise covariance
