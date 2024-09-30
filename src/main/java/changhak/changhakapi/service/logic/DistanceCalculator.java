@@ -58,15 +58,17 @@ public class DistanceCalculator {
             double weight = 1 / Math.abs(cellRssi); // cellRssi의 절댓값의 역수
             sumOfWeights += weight; // 모든 cellRssi의 절댓값의 역수의 합
 
-            distance += weight * Math.abs(cellRssi - currentRssi); // 가중치를 적용한 distance 계산
+            // 가중치를 적용하여 유클리드 거리 계산
+            distance += weight * Math.pow(Math.abs(cellRssi - currentRssi), 2);
         }
 
         // 가중치를 적용하여 최종 distance 계산
         if (sumOfWeights != 0) {
-            distance /= sumOfWeights; // 가중치의 합으로 나누기
+            distance = Math.sqrt(distance / sumOfWeights); // 가중치의 합으로 나누고 제곱근을 취하기
         }
 
         return distance; // i번째 cell의 distance
     }
+
 }
 
