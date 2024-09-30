@@ -13,15 +13,19 @@ import java.util.stream.IntStream;
 public class Signal2Location {
 
     private static final int TOP_N = 10; // 상위 N개의 신호를 선택하기 위한 값
+
     private static final int K = 3;
+
     private static final Logger logger = LoggerFactory.getLogger(Signal2Location.class);
     private final LocationEstimator locationEstimator;
+    private final DistanceCalculator distanceCalculator;
 //    private final KalmanFilter kalmanFilterX;
 //    private final KalmanFilter kalmanFilterY;
 
     @Autowired
-    public Signal2Location(LocationEstimator locationEstimator) {
+    public Signal2Location(LocationEstimator locationEstimator, DistanceCalculator distanceCalculator) {
         this.locationEstimator = locationEstimator;
+        this.distanceCalculator =distanceCalculator;
 //        this.kalmanFilterX = new KalmanFilter(0.5, 1, 37.63221356558527, 1); // 초기값은 예시
 //        this.kalmanFilterY = new KalmanFilter(0.5, 1, 127.07946420260444, 1);
     }
@@ -33,25 +37,25 @@ public class Signal2Location {
             currentSignals.put(entry.getKey(), Integer.parseInt(entry.getValue()));
         }
 
-        // currentSignals 맵을 정렬된 상위 10개로 필터링하고, 2차원 배열로 변환
-        String[][] filtered = currentSignals.entrySet()                             //<key, value> Set
+        // currentSignals(Map)을 정렬된 상위 10개로 필터링하고, (2차원배열)로 변환
+        String[][] filtered = currentSignals.entrySet()                             //<ap, rssi> Set
                 .stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())   //value 내림차순 정렬
-                .limit(TOP_N)
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())   //rssi 내림차순 정렬
+                .limit(TOP_N)                                                       //상위 10개
                 //여러개의 1차원 배열 [ap,rssi]을 가지는 스트림
                 .map(entry -> new String[]{entry.getKey(), String.valueOf(entry.getValue())})
               //.toArray(size -> new String[size][]); 람다식으로 표현하면,
                 .toArray(String[][]::new);                                          //최종적으로 2차원 배열로 변환
 
-        double[] distance = DistanceCalculator.calcAllDistance(filtered);
+        double[] distances = distanceCalculator.calcAllDistance(filtered);
 
         // distance.length = numCells = 144
-        int[] closestIndices = IntStream.range(0, distance.length)      //0부터 distance.len-1 까지의 IntStream 생성
-                .boxed()                                                //int->Integer
-                .sorted(Comparator.comparingDouble(i -> distance[i]))   //distance 베열을 기준으로 정렬
-                .mapToInt(i -> i)                                       //Integer->int
-                .limit(K)
-                .toArray();
+        int[] closestIndices = IntStream.range(0, distances.length)         //0부터 distances.len-1 까지의 IntStream 생성
+                .boxed()                                                    //int->Integer
+                .sorted(Comparator.comparingDouble(i -> distances[i]))      //distance 값을 기준으로 정렬
+                .mapToInt(i -> i)                                           //Integer->int
+                .limit(K)                                                   //distance가 작은순서로 K개 추출
+                .toArray();                                                 //거리가 가장 작은 K개 셀의 인덱스 배열
 
         // 로그를 위한 배열
         int[] adjustedIndices = IntStream.of(closestIndices)
@@ -59,7 +63,7 @@ public class Signal2Location {
                 .toArray();
         logger.info("Indices of the smallest 3 distances (adjusted): {}", Arrays.toString(adjustedIndices));
 
-        double[] estimateCoordinates = locationEstimator.estimateLoc(distance, K);
+        double[] estimateCoordinates = locationEstimator.estimateLoc(distances, K);
         logger.info("Estimated coordinates: {}", Arrays.toString(estimateCoordinates));
         logger.info("test");
 

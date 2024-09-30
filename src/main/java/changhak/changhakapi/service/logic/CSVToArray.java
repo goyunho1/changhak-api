@@ -35,12 +35,24 @@ public class CSVToArray {
                     data[i] = data[i].replaceAll("^\"|\"$", "");
                 }
 
-                // 올바른 인덱스의 데이터를 배열에 추가
+                // 올바른 인덱스의 데이터를 배열에 추가          cell, mac, rssi
                 allCellSignalsList.add(new String[]{data[1], data[2], data[3]});
+
+                //List<String[]> allCellSignalsList = [
+                //    {"101", "00:11:22:33:44:55", "-65"},
+                //    {"102", "66:77:88:99:AA:BB", "-70"},
+                //    {"103", "FF:EE:DD:CC:BB:AA", "-80"}
+                //];
             }
         }
 
         // 2차원 배열로 변환
         return allCellSignalsList.toArray(new String[0][0]);
+
+        //String[][] allCellSignals = {
+        //    {"101", "00:11:22:33:44:55", "-65"},
+        //    {"102", "66:77:88:99:AA:BB", "-70"},
+        //    {"103", "FF:EE:DD:CC:BB:AA", "-80"}
+        //};
     }
 }

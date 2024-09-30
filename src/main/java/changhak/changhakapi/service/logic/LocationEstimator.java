@@ -1,9 +1,16 @@
 package changhak.changhakapi.service.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import java.util.Comparator;
 import java.util.stream.IntStream;
 
+@Component
 public class LocationEstimator {
+    private static final Logger logger = LoggerFactory.getLogger(LocationEstimator.class);
+
     // 창학관 x 좌표 배열
     private static double[] x = {
             37.63266876291934, 37.63266197892042, 37.632652940543466, 37.632641653495384,
@@ -88,15 +95,19 @@ public class LocationEstimator {
             127.07992043190616,127.07992043190616,127.07992043190616
     };
 
-    public static double[] estimateLoc(double[] distances, int K) {
-        int[] closestIndices = IntStream.range(0, distances.length)
+    public double[] estimateLoc(double[] distances, int K) {
+                                             // 에러 측정시 기준 좌표
+        double targetX = 37.632605509317244; // 예시 값, 원하는 특정 위치의 위도
+        double targetY = 127.07944196190547; // 예시 값, 원하는 특정 위치의 경도
+
+        int[] closestIndices = IntStream.range(0, distances.length)     //0부터 distances.len-1 까지의 IntStream 생성
                 .boxed()
                 .sorted(Comparator.comparingDouble(i -> distances[i]))
                 .mapToInt(i -> i)
                 .limit(K)
                 .toArray();
 
-        double[] minDistances = new double[K];
+        double[] minDistances = new double[K]; //
         for (int i = 0; i < K; i++) {
             minDistances[i] = distances[closestIndices[i]];
         }
@@ -117,6 +128,10 @@ public class LocationEstimator {
 
         x_hat /= totalWeight;
         y_hat /= totalWeight;
+
+        double distanceError = Math.sqrt(Math.pow(x_hat - targetX, 2) + Math.pow(y_hat - targetY, 2));
+        double actualError = distanceError * 88000;
+        logger.info("actualError : {}", actualError);
 
         //double 배열에 담아 보낼거라서 double로 선언
         double floor = 0;
