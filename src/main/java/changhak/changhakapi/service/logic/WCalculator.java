@@ -7,17 +7,16 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.HashMap;
 
-
 @Component
-public class DistanceCalculator {
-    private static final Logger logger = LoggerFactory.getLogger(DistanceCalculator.class);
-    public double[] calcAllDistance (String[][]currentSignals){
+public class WCalculator {
+    private static final Logger logger = LoggerFactory.getLogger(WCalculator.class);
+    public double[] calcAllDistance (String[][]currentSignals,double[] distances){
 
         int NumCells = 144;                                      // 셀의 개수
 
         String[][] allCellSignals = null;
         try {
-            String csvFilePath = "/home/ubuntu/FinalDB_12.csv"; // CSV 파일 경로
+            String csvFilePath = "/home/ubuntu/FinalDB_40.csv"; // CSV 파일 경로
             allCellSignals = CSVToArray.readCSVToArray(csvFilePath);
             //String[][] allCellSignals = {
             //    {"101", "00:11:22:33:44:55", "-65"},
@@ -32,15 +31,35 @@ public class DistanceCalculator {
             throw new RuntimeException("Failed to load cell signals from CSV file.");
         }
 
-        double[] distances = new double[NumCells];
-
-        for (int i = 0; i < NumCells; i++) {                            //cell 당 데이터 개수 : 20
-            String[][] cellSignals = Arrays.copyOfRange(allCellSignals, i * 20, (i + 1) * 20);
-
-            distances[i] = calcDistance(cellSignals, currentSignals);   //cellSignals => 20개의 cell, ap(mac), rssi 2차원 배열
-            //currentSignals => 상위 10개 ap,rssi 2차원 배열
+        double[] w = new double[NumCells];
+        double wSum = 0;
+        for (int i = 0; i < NumCells; i++) {
+            w[i] = 0.00001;
         }
-        return distances;   //각 cell과의 distance를 담은 배열 (인덱스 0 => 1번 cell)
+
+        for (String[] currentSignal : currentSignals) {
+            String mac = currentSignal[0];
+
+            for (int i = 0; i < NumCells; i++) {
+                String[][] cellSignals = Arrays.copyOfRange(allCellSignals, i * 40, (i + 1) * 40);
+                for (String[] cellSignal : cellSignals) {
+                    if (cellSignal[1].equals(mac)) {
+                        w[i] += 1;
+                    }
+                }
+            }
+        }
+
+        for (double v : w) {
+            wSum += (1/v);
+        }
+        //logger.info("w: {}", Arrays.toString(w));
+        double[] d2 = new double[NumCells];
+        for (int i = 0; i < NumCells; i++) {
+            d2[i] = ((1/w[i])* distances[i]) / wSum;
+        }
+        //logger.info("d2: {}", Arrays.toString(d2));
+        return d2;   //각 cell과의 distance를 담은 배열 (인덱스 0 => 1번 cell)
     }
 
     private static double calcDistance(String[][] cellSignals, String[][] currentSignals) {
@@ -63,3 +82,4 @@ public class DistanceCalculator {
         return distance;    //i번째 cell의 distance
     }
 }
+
