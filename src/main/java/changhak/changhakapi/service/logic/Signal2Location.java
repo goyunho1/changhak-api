@@ -65,7 +65,7 @@ public class Signal2Location {
 
         double[] estimateCoordinates = locationEstimator.estimateLoc(distances, K);
         logger.info("Estimated coordinates: {}", Arrays.toString(estimateCoordinates));
-        logger.info("test1");
+        logger.info("w");
 
 //        double filteredX = kalmanFilterX.update(estimateCoordinates[0]);
 //        double filteredY = kalmanFilterY.update(estimateCoordinates[1]);
