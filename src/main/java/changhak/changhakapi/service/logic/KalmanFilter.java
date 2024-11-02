@@ -29,12 +29,4 @@ public class KalmanFilter {
 
         return x;
     }
-
-    public void setProcessNoiseCovariance(double q) {
-        this.q = q;
-    }
-
-    public void setMeasurementNoiseCovariance(double r) {
-        this.r = r;
-    }
 }

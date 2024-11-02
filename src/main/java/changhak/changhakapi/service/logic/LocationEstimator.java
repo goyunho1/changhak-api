@@ -122,7 +122,7 @@ public class LocationEstimator {
                 .toArray();
 
         double floor = 0;
-        int a = closestIndices[0] + 1;
+        int a = closestIndices[0] + 1; //거리가 가장 작은 셀
 
         if ((a<=132 && a>=67) || (a>=159 && a<=172)){
             floor = 2;
@@ -151,35 +151,7 @@ public class LocationEstimator {
         for (int i = 0; i < K; i++) {
             minDistances[i] = distances[closestIndices[i]];
         }
-//
-//        //강의실
-//        if ((a>=159 && a<=172) || (a>=145 && a<=158)) {
-//            double totalWeight = 0;
-//            for (double d : minDistances) {
-//                totalWeight += 1.0 / Math.pow(d,2);
-//            }
-//
-//            for (int i = 0; i < K; i++) {
-//                int index = closestIndices[i];
-//                x_hat += x[index] * (1.0 / Math.pow(minDistances[i],2));
-//                y_hat += y[index] * (1.0 / Math.pow(minDistances[i],2));
-//            }
-//
-//            x_hat /= totalWeight;
-//            y_hat /= totalWeight;
-//
-//            return new double[]{x_hat, y_hat, floor};
-//        }
-//
-//        //강의실
-//        if ((a>=159 && a<=172) || (a>=145 && a<=158)) {
-//            x_hat = x[a - 1];
-//            y_hat = y[a - 1];
-//
-//            return new double[]{x_hat, y_hat, floor};
-//        }
 
-        //나머지
         double totalWeight = 0;
         for (double d : minDistances) {
             totalWeight += 1.0 / d;
@@ -193,10 +165,6 @@ public class LocationEstimator {
 
         x_hat /= totalWeight;
         y_hat /= totalWeight;
-
-//        double distanceError = Math.sqrt(Math.pow(x_hat - targetX, 2) + Math.pow(y_hat - targetY, 2));
-//        double actualError = distanceError * 88000;
-//        logger.info("actualError : {}", actualError);
 
         return new double[]{x_hat, y_hat, floor};
     }

@@ -41,38 +41,6 @@ public class DistanceCalculator {
         }
         return distances;   //각 cell과의 distance를 담은 배열 (인덱스 0 => 1번 cell)
     }
-//
-//    private static double calcDistance(String[][] cellSignals, String[][] currentSignals) {
-//        HashMap<String, Double> cellTable = new HashMap<>();
-//        for (String[] cellSignal : cellSignals) {
-//            cellTable.put(cellSignal[1], Double.parseDouble(cellSignal[2]));     //cellTable<ap,rssi>, size = 20
-//        }
-//
-//        double distance = 0;
-//       // double defaultRssi = -1000;
-//        int count = 0;
-//
-//        for (String[] currentSignal : currentSignals) {
-//            if (count >= 7) {
-//                break;  // 매칭된 AP가 10개 이상이면 루프 종료
-//            }
-//                                                                        //currentSignals => 측정한 rssi값 상위 10개의 ap,rssi 2차원 배열
-//            String mac = currentSignal[0];                              //ap 측정값
-//            double currentRssi = Double.parseDouble(currentSignal[1]);  //rssi 측정값
-//
-//            if (cellTable.containsKey(mac)) {
-//                double cellRssi = cellTable.get(mac);
-//                distance += Math.abs((cellRssi - currentRssi));
-//                count ++;
-//            }
-//        }
-//        if (count < 7) {
-//            return 1000;
-//        }
-//
-//
-//        return distance;    //i번째 cell의 distance
-//    }
     private static double calcDistance(String[][] cellSignals, String[][] currentSignals) {
         HashMap<String, Double> cellTable = new HashMap<>();
         for (String[] cellSignal : cellSignals) {
