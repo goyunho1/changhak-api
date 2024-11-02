@@ -19,15 +19,15 @@ public class Signal2Location {
     private static final Logger logger = LoggerFactory.getLogger(Signal2Location.class);
     private final LocationEstimator locationEstimator;
     private final DistanceCalculator distanceCalculator;
-//    private final KalmanFilter kalmanFilterX;
-//    private final KalmanFilter kalmanFilterY;
+    private final KalmanFilter kalmanFilterX;
+    private final KalmanFilter kalmanFilterY;
 
     @Autowired
     public Signal2Location(LocationEstimator locationEstimator, DistanceCalculator distanceCalculator) {
         this.locationEstimator = locationEstimator;
         this.distanceCalculator =distanceCalculator;
-//        this.kalmanFilterX = new KalmanFilter(0.5, 1, 37.63221356558527, 1); // 초기값은 예시
-//        this.kalmanFilterY = new KalmanFilter(0.5, 1, 127.07946420260444, 1);
+        this.kalmanFilterX = new KalmanFilter(0.5, 1, 37.63221356558527, 1); // 초기값은 예시
+        this.kalmanFilterY = new KalmanFilter(0.5, 1, 127.07946420260444, 1);
     }
 
     public Location calc(Map<String, String> signals){
@@ -37,7 +37,7 @@ public class Signal2Location {
             currentSignals.put(entry.getKey(), Integer.parseInt(entry.getValue()));
         }
 
-        // currentSignals(Map)을 정렬된 상위 10개로 필터링하고, (2차원배열)로 변환
+        // currentSignals(Map)을 정렬된 (//상위 10개로) 필터링하고, (2차원배열)로 변환
         String[][] filtered = currentSignals.entrySet()                             //<ap, rssi> Set
                 .stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())   //rssi 내림차순 정렬
@@ -57,6 +57,15 @@ public class Signal2Location {
                 .limit(K)                                                   //distance가 작은순서로 K개 추출
                 .toArray();                                                 //거리가 가장 작은 K개 셀의 인덱스 배열
 
+
+        // 로그를 위한 배열과 해당 distance 값을 포함한 로그 추가
+        logger.info("Indices and distances of the smallest {} distances (adjusted): {}",
+                K,
+                Arrays.toString(IntStream.of(closestIndices)
+                        .mapToObj(i -> String.format("(index: %d, distance: %.2f)", i + 1, distances[i]))
+                        .toArray()));
+
+
         // 로그를 위한 배열
         int[] adjustedIndices = IntStream.of(closestIndices)
                 .map(i -> i + 1 )
@@ -65,14 +74,14 @@ public class Signal2Location {
 
         double[] estimateCoordinates = locationEstimator.estimateLoc(distances, K);
         logger.info("Estimated coordinates: {}", Arrays.toString(estimateCoordinates));
-        logger.info("test");
+        logger.info("---");
 
-//        double filteredX = kalmanFilterX.update(estimateCoordinates[0]);
-//        double filteredY = kalmanFilterY.update(estimateCoordinates[1]);
-//        logger.info("Filtered coordinates: ({}, {})", filteredX, filteredY);
+        double filteredX = kalmanFilterX.update(estimateCoordinates[0]);
+        double filteredY = kalmanFilterY.update(estimateCoordinates[1]);
+        logger.info("Filtered coordinates: ({}, {})", filteredX, filteredY);
 
         double floor = estimateCoordinates[2];
 
-        return new Location(estimateCoordinates[0], estimateCoordinates[1], floor);
+        return new Location(filteredX, filteredY, floor);
     }
 }

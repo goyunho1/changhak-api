@@ -48,9 +48,17 @@ public class LocationEstimator {
             37.632479603561045, 37.632508876079235, 37.632540404856556, 37.63257643475903,
             37.632607961634555, 37.632639488508794,
             37.63218880566136, 37.63219333155779,
-            37.63228789494212, 37.63228789494212, 37.63228789494212, 37.63228789494212,
+            37.63228789494212, 37.63228789494212, 37.63228789494212, 37.63228789494212,    //계단
             37.63261468671524,37.63261468671524, 37.63261468671524,
-            37.6324362513899,37.6324362513899, 37.6324362513899
+            37.6324362513899,37.6324362513899, 37.6324362513899,
+            37.63218173847149,  37.63216818148664,  37.63215246221144,  37.63213665084928,
+            37.63209841653141,  37.632082609017495,  37.6320691421858,  37.63205333275919,
+            37.63230566417129,  37.632294371186866,  37.63226513134332,  37.632253834531014,
+            37.63222009167183,  37.63220879678249,  37.63267082882012,  37.63265726825765,
+            37.632623534737135,  37.632609976089505,  37.6327498933572,  37.632740856916826,
+            37.63272956419909,  37.63272278209439,  37.63271149124795,  37.63270259924183,
+            37.6326935666042,  37.632684528255815,  37.63267323933113,  37.63266420095318
+
     };
 
     // 창학관 y 좌표 배열
@@ -92,13 +100,19 @@ public class LocationEstimator {
             127.0794386860781, 127.07940753625172,
             127.07946711399507,127.07946711399507,127.07946711399507,127.07946711399507,
             127.07919273311532,127.07919273311532,127.07919273311532,
-            127.07992043190616,127.07992043190616,127.07992043190616
+            127.07992043190616,127.07992043190616,127.07992043190616,
+            127.07989750142285,  127.07995979617546,  127.07988897336288,  127.07995409791562,
+            127.07986908984985,  127.07992854989149,  127.07985772957703,  127.07992002183076,
+            127.07983815696272,  127.07988346078834,  127.07982112014129,  127.0798720884261,
+            127.07980691076034,  127.07985504677765,  127.07944486369837,  127.07951282345361,
+            127.07943348432393,  127.07949861178405,  127.07910507648893,  127.07914471856628,
+            127.07919002276138,  127.07922683495056,  127.0792693068642,  127.07909369731762,
+            127.07912767485657,  127.07917014915824,  127.07920978880217,  127.07925226308231
     };
 
     public double[] estimateLoc(double[] distances, int K) {
-                                             // 에러 측정시 기준 좌표
-        double targetX = 37.632605509317244; // 예시 값, 원하는 특정 위치의 위도
-        double targetY = 127.07944196190547; // 예시 값, 원하는 특정 위치의 경도
+        double x_hat = 0;
+        double y_hat = 0;
 
         int[] closestIndices = IntStream.range(0, distances.length)     //0부터 distances.len-1 까지의 IntStream 생성
                 .boxed()
@@ -107,18 +121,69 @@ public class LocationEstimator {
                 .limit(K)
                 .toArray();
 
+        double floor = 0;
+        int a = closestIndices[0] + 1;
+
+        if ((a<=132 && a>=67) || (a>=159 && a<=172)){
+            floor = 2;
+        }
+        else if (a == 134 || a ==133 || (a>=1 && a<=66) || (a>=145 && a<=158)) {
+            floor = 1;
+        }
+        //계단 위치 고정
+        if ((a>=135 && a<=138)){
+            x_hat = x[134];
+            y_hat = y[134];
+            return new double[]{x_hat, y_hat, floor};
+        }
+        else if ((a>=139 && a<=141)){
+            x_hat = x[138];
+            y_hat = y[138];
+            return new double[]{x_hat, y_hat, floor};
+        }
+        else if ((a>=142 && a<=144)){
+            x_hat = x[141];
+            y_hat = y[141];
+            return new double[]{x_hat, y_hat, floor};
+        }
+
         double[] minDistances = new double[K]; //
         for (int i = 0; i < K; i++) {
             minDistances[i] = distances[closestIndices[i]];
         }
+//
+//        //강의실
+//        if ((a>=159 && a<=172) || (a>=145 && a<=158)) {
+//            double totalWeight = 0;
+//            for (double d : minDistances) {
+//                totalWeight += 1.0 / Math.pow(d,2);
+//            }
+//
+//            for (int i = 0; i < K; i++) {
+//                int index = closestIndices[i];
+//                x_hat += x[index] * (1.0 / Math.pow(minDistances[i],2));
+//                y_hat += y[index] * (1.0 / Math.pow(minDistances[i],2));
+//            }
+//
+//            x_hat /= totalWeight;
+//            y_hat /= totalWeight;
+//
+//            return new double[]{x_hat, y_hat, floor};
+//        }
+//
+//        //강의실
+//        if ((a>=159 && a<=172) || (a>=145 && a<=158)) {
+//            x_hat = x[a - 1];
+//            y_hat = y[a - 1];
+//
+//            return new double[]{x_hat, y_hat, floor};
+//        }
 
+        //나머지
         double totalWeight = 0;
         for (double d : minDistances) {
             totalWeight += 1.0 / d;
         }
-
-        double x_hat = 0;
-        double y_hat = 0;
 
         for (int i = 0; i < K; i++) {
             int index = closestIndices[i];
@@ -129,20 +194,9 @@ public class LocationEstimator {
         x_hat /= totalWeight;
         y_hat /= totalWeight;
 
-        double distanceError = Math.sqrt(Math.pow(x_hat - targetX, 2) + Math.pow(y_hat - targetY, 2));
-        double actualError = distanceError * 88000;
-        logger.info("actualError : {}", actualError);
-
-        //double 배열에 담아 보낼거라서 double로 선언
-        double floor = 0;
-        int a = closestIndices[0] + 1;
-
-        if (a<=132 && a>=67){
-            floor = 2;
-        }
-        else if (a == 134 || a ==133 || (a>=1 && a<=66)){
-            floor = 1;
-        }
+//        double distanceError = Math.sqrt(Math.pow(x_hat - targetX, 2) + Math.pow(y_hat - targetY, 2));
+//        double actualError = distanceError * 88000;
+//        logger.info("actualError : {}", actualError);
 
         return new double[]{x_hat, y_hat, floor};
     }
